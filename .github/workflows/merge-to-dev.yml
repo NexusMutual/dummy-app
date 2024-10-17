@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build:
-    uses: NexusMutual/workflows/.github/workflows/build.yml
+    uses: NexusMutual/workflows/.github/workflows/build.yml@master
     with:
       repo: ${{ github.repository }}
       branch: ${{ github.ref }}
