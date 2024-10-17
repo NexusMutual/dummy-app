@@ -1,0 +1,17 @@
+name: Merge to dev
+
+on:
+  push:
+    branches:
+      - dev
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: NexusMutual/workflows/.github/workflows/build.yml
+    with:
+      repo: ${{ github.repository }}
+      branch: dev
