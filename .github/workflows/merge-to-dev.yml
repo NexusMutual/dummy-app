@@ -2,8 +2,7 @@ name: Merge to dev
 
 on:
   push:
-    branches:
-      - dev
+    branches: ['*']
 
 concurrency:
   group: ${{ github.repository }}-${{ github.ref }}
@@ -14,4 +13,4 @@ jobs:
     uses: NexusMutual/workflows/.github/workflows/build.yml
     with:
       repo: ${{ github.repository }}
-      branch: dev
+      branch: ${{ github.ref }}
