@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/github-script@v7
         with:
-          script: console.log(JSON.stringify(global, null, 2));
+          script: console.log(JSON.stringify({ ...global }, null, 2));
 
 #          script: |
 #            github.rest.repos.createDispatchEvent({
