@@ -13,8 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-
-      - name: Create GitHub app token
+      - name: Create requestooor app token
         uses: actions/create-github-app-token@v1
         id: app-token
         with:
@@ -30,7 +29,6 @@ jobs:
           script: |
             const repo = context.repo.repo;
             const [,,branch] = context.ref.split('/');
-
             const request = {
               owner: context.repo.owner,
               repo: 'workflows',
@@ -38,6 +36,4 @@ jobs:
               client_payload: { repo, branch }
             };
 
-            console.log(request);
-            const result = await github.rest.repos.createDispatchEvent(request);
-            console.log(result);
+            await github.rest.repos.createDispatchEvent(request);
