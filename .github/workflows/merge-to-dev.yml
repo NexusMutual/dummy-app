@@ -20,7 +20,8 @@ jobs:
           app-id: ${{ vars.REQUESTOR_APP_ID }}
           private-key: ${{ secrets.REQUESTOR_APP_PK }}
           owner: ${{ github.repository_owner }}
-          repositories: ['workflows']
+          repositories:
+            - workflows
 
       - uses: actions/github-script@v7
         with:
