@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        required: true
+        type: string
+    secrets:
+      personal_access_token:
+        required: true
+
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+    environment: production
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: '${{ env.GITHUB_TOKEN }}'
+          ref: ${{ env.TARGET_BRANCH }}
+          path: code
+
+      - name: ls
+        run: ls -la code
