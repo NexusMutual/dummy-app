@@ -12,6 +12,9 @@ on:
       bump-command:
         type: string
         default: npm version patch --no-git-tag-version
+    secrets:
+      token:
+        required: true
 
 jobs:
 
@@ -24,6 +27,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
+          token: ${{ secrets.token }}
 
       - uses: actions/setup-node@v3
         with:
