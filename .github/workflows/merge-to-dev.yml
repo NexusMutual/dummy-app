@@ -10,12 +10,12 @@ concurrency:
 
 jobs:
 
-#  bump:
-#    uses: ./.github/workflows/bump.yml
-#    with:
-#      ref: dev
-#    secrets:
-#      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  bump:
+    uses: ./.github/workflows/bump.yml
+    with:
+      ref: dev
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   pre-build:
     runs-on: ubuntu-22.04
@@ -25,6 +25,9 @@ jobs:
       - name: Prepare vars
         id: vars
         run: echo "REGISTRY=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
+      - name: Check registry
+        if: steps.vars.outputs.REGISTRY != ''
+        run: echo OK
 
   build:
     uses: ./.github/workflows/build.yml
