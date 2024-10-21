@@ -1,0 +1,65 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        default: dev
+      dockerfile:
+        type: string
+        default: Dockerfile
+      registry:
+        type: string
+        required: true
+      app-name:
+        type: string
+        required: true
+    secrets:
+      token:
+        required: true
+    outputs:
+      image-tag:
+        value: ${{ jobs.build.outputs.image-tag }}
+
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    outputs:
+      image-tag: ${{ steps.vars.outputs.TAG }}
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.token }}
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v3
+
+      - name: Get version and revision
+        id: vars
+        run: |
+          VERSION=$(node -p 'require("./package.json").version')
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "TAG=${VERSION}-${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+      - name: Build image
+        env:
+          REGISTRY: ${{ inputs.registry }}
+          IMAGE: ${{ inputs.app-name }}
+          TAG: ${{ steps.vars.outputs.TAG }}
+        run: docker build -t "${REGISTRY}/${IMAGE}:${TAG}" -f ${{ inputs.dockerfile }} .
+
+      - name: Push image
+        env:
+          REGISTRY: ${{ inputs.registry }}
+          IMAGE: ${{ inputs.app-name }}
+          TAG: ${{ steps.vars.outputs.TAG }}
+        run: docker push "${REGISTRY}/${IMAGE}:${TAG}"
+
+      - name: Print tag
+        run: echo "The image tag is '${{ steps.vars.outputs.TAG }}'"

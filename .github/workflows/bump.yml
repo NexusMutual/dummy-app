@@ -1,0 +1,56 @@
+name: Bump version
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        default: dev
+      node-version:
+        type: string
+        default: 20
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+    outputs:
+      image-tag:
+        value: ${{ jobs.bump.outputs.image-tag }}
+
+jobs:
+
+  bump:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+
+    outputs:
+      image-tag: ${{ steps.output-step.outputs.image-tag }}
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: node_modules
+          key: node-modules-cache-node-${{ inputs.node-version }}-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci --prefer-offline --no-audit --no-fund --ignore-scripts
+
+      - name: ls
+        run: ls -la
+
+      - name: test output
+        id: output-step
+        run: echo "image-tag=v1.0.0-hash" >> $GITHUB_OUTPUT

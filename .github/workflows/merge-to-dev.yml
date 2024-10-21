@@ -10,30 +10,35 @@ concurrency:
 
 jobs:
 
-  build:
+#  bump:
+#    uses: ./.github/workflows/bump.yml
+#    with:
+#      ref: dev
+#    secrets:
+#      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pre-build:
     runs-on: ubuntu-22.04
+    outputs:
+      registry: ${{ steps.vars.outputs.REGISTRY }}
     steps:
-      - name: Create requestooor app token
-        uses: actions/create-github-app-token@v1
-        id: app-token
-        with:
-          app-id: ${{ vars.REQUESTOR_APP_ID }}
-          private-key: ${{ secrets.REQUESTOR_APP_PK }}
-          owner: ${{ github.repository_owner }}
-          repositories: workflows
+      - name: Prepare vars
+        id: vars
+        run: echo "REGISTRY=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
 
-      - name: Dispatch build event
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ steps.app-token.outputs.token }}
-          script: |
-            const repo = context.repo.repo;
-            const [,,branch] = context.ref.split('/');
-            const request = {
-              owner: context.repo.owner,
-              repo: 'workflows',
-              event_type: 'build',
-              client_payload: { repo, branch }
-            };
+  build:
+    uses: ./.github/workflows/build.yml
+    needs: pre-build
+    with:
+      registry: ${{ needs.pre-build.outputs.registry }}
+      app-name: dummy-app
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
 
-            await github.rest.repos.createDispatchEvent(request);
+  post-build:
+    environment: production
+    runs-on: ubuntu-22.04
+    needs: build
+    steps:
+      - name: Print output tag
+        run: echo "The output tag is '${{ needs.build.outputs.image-tag }}'"
