@@ -15,7 +15,7 @@ jobs:
     with:
       ref: dev
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.GITHUB_TOKEN }}
 
   pre-build:
     runs-on: ubuntu-22.04
