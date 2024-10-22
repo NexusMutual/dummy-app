@@ -48,10 +48,10 @@ jobs:
       - name: Bump version
         run: ${{ inputs.bump-command }}
 
-      - name: Get version
+      - name: Get package.json version
         run: echo VERSION=$(node -p 'require("./package.json").version') >> $GITHUB_ENV
 
-      - name: Commit and push
+      - name: Commit, tag and push
         run: |
           git config --local user.email "version-bumpooor@nexusmutual.io"
           git config --local user.name "Version bumpooor"

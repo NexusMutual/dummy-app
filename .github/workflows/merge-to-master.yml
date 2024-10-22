@@ -1,8 +1,10 @@
-name: Merge to dev
+name: Merge to master
 
 on:
-  push:
-    branches: [dev]
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
 
 concurrency:
   group: ${{ github.repository }}-${{ github.ref }}

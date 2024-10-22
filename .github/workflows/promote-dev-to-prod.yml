@@ -1,0 +1,17 @@
+name: Promote dev to prod
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}-deploy
+  cancel-in-progress: true
+
+jobs:
+
+  deploy:
+    uses: ./.github/workflows/deploy.yml
+    with:
+      ref: dev
+    secrets:
+      token: ${{ secrets.token }}
