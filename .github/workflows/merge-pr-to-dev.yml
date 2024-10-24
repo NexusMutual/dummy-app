@@ -1,4 +1,4 @@
-name: Merge to dev
+name: Merge PR to dev
 
 on:
   push:
@@ -11,7 +11,7 @@ concurrency:
 jobs:
 
   bump:
-    uses: ./.github/workflows/bump.yml
+    uses: ./.github/workflows/w-bump.yml
     with:
       ref: dev
     secrets:
@@ -30,7 +30,7 @@ jobs:
         run: echo OK
 
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/w-build.yml
     needs: pre-build
     with:
       registry: ${{ needs.pre-build.outputs.registry }}

@@ -1,11 +1,7 @@
-name: Deploy
+name: Deploy master branch to prod
 
 on:
   workflow_call:
-    inputs:
-      ref:
-        type: string
-        default: dev
     secrets:
       token:
         required: true
@@ -21,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: '${{ secrets.token }}'
-          ref: ${{ inputs.ref }}
+          ref: master
 
-      - name: ls
-        run: ls -la code
+      - name: Fast forward dev to master
+        run: "echo 'TODO: implement argocd commit using app'"

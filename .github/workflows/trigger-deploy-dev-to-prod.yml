@@ -1,0 +1,24 @@
+name: Merge dev to master
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: '${{ secrets.token }}'
+          ref: master
+
+      - name: Fast forward dev to master
+        run: |
+          git fetch origin
+          git merge origin/dev --ff-only
+          git push origin master

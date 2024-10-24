@@ -1,10 +1,10 @@
-name: Merge to master
+name: Merge PR to master
 
 on:
   pull_request:
     types: [closed]
     branches:
-      - dev
+      - master
 
 concurrency:
   group: ${{ github.repository }}-${{ github.ref }}
@@ -13,7 +13,7 @@ concurrency:
 jobs:
 
   bump:
-    uses: ./.github/workflows/bump.yml
+    uses: ./.github/workflows/w-bump.yml
     with:
       ref: dev
     secrets:
@@ -32,7 +32,7 @@ jobs:
         run: echo OK
 
   build:
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/w-build.yml
     needs: pre-build
     with:
       registry: ${{ needs.pre-build.outputs.registry }}
