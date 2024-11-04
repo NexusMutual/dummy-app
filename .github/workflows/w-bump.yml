@@ -5,7 +5,7 @@ on:
     inputs:
       ref:
         type: string
-        default: dev
+        required: true
       node-version:
         type: string
         default: 20
@@ -17,13 +17,9 @@ on:
         required: true
 
 jobs:
-
-  setup:
+  bump:
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
-
     steps:
-
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
@@ -35,14 +31,7 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: node_modules
-          key: node-modules-cache-node-${{ env.NODE_VERSION }}-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
 
       - name: Bump version

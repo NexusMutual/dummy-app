@@ -1,0 +1,18 @@
+name: Rollback production
+
+on:
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        description: 'Docker image tag to rollback to'
+        required: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/w-deploy.yml
+    with:
+      ref: master
+      environment: production
+      image-tag: ${{ github.event.inputs.image-tag }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

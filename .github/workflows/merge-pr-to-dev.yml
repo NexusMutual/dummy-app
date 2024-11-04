@@ -4,12 +4,7 @@ on:
   push:
     branches: [dev]
 
-concurrency:
-  group: ${{ github.repository }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-
   bump:
     uses: ./.github/workflows/w-bump.yml
     with:
@@ -17,31 +12,22 @@ jobs:
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
-  pre-build:
-    runs-on: ubuntu-22.04
-    outputs:
-      registry: ${{ steps.vars.outputs.REGISTRY }}
-    steps:
-      - name: Prepare vars
-        id: vars
-        run: echo "REGISTRY=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
-      - name: Check registry
-        if: steps.vars.outputs.REGISTRY != ''
-        run: echo OK
-
   build:
+    needs: bump
     uses: ./.github/workflows/w-build.yml
-    needs: pre-build
     with:
-      registry: ${{ needs.pre-build.outputs.registry }}
+      ref: dev
+      registry: ${{ secrets.REGISTRY }}
       app-name: dummy-app
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
-  post-build:
-    environment: production
-    runs-on: ubuntu-22.04
+  deploy:
     needs: build
-    steps:
-      - name: Print output tag
-        run: echo "The output tag is '${{ needs.build.outputs.image-tag }}'"
+    uses: ./.github/workflows/w-deploy.yml
+    with:
+      ref: dev
+      environment: staging
+      image-tag: ${{ needs.build.outputs.image-tag }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

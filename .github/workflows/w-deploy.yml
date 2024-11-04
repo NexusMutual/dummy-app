@@ -1,23 +1,33 @@
-name: Deploy master branch to prod
+name: Deploy
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+      environment:
+        type: string
+        required: true
+      image-tag:
+        type: string
+        required: true
     secrets:
       token:
         required: true
 
 jobs:
-
-  build:
+  deploy:
     runs-on: ubuntu-22.04
-    timeout-minutes: 5
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: '${{ secrets.token }}'
-          ref: master
+          repository: '${{ github.repository_owner }}'/argocd
+          token: ${{ secrets.token }}
+          ref: ${{ inputs.ref }}
 
-      - name: Fast forward dev to master
-        run: "echo 'TODO: implement argocd commit using app'"
+      - name: Deploy to ArgoCD
+        run: |
+          echo "Updating ArgoCD with image tag ${{ inputs.image-tag }} for environment ${{ inputs.environment }}"
+          # Add your ArgoCD deployment logic here

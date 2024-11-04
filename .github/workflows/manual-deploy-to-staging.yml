@@ -1,0 +1,18 @@
+name: Manual deploy to staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      image-tag:
+        description: 'Docker image tag to deploy'
+        required: true
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/w-deploy.yml
+    with:
+      ref: dev
+      environment: staging
+      image-tag: ${{ github.event.inputs.image-tag }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

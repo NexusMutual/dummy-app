@@ -6,44 +6,49 @@ on:
     branches:
       - master
 
-concurrency:
-  group: ${{ github.repository }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-
   bump:
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/w-bump.yml
     with:
-      ref: dev
+      ref: master
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
-  pre-build:
-    runs-on: ubuntu-22.04
-    outputs:
-      registry: ${{ steps.vars.outputs.REGISTRY }}
-    steps:
-      - name: Prepare vars
-        id: vars
-        run: echo "REGISTRY=${{ env.REGISTRY }}" >> $GITHUB_OUTPUT
-      - name: Check registry
-        if: steps.vars.outputs.REGISTRY != ''
-        run: echo OK
-
   build:
+    needs: bump
     uses: ./.github/workflows/w-build.yml
-    needs: pre-build
     with:
-      registry: ${{ needs.pre-build.outputs.registry }}
+      ref: master
+      registry: ${{ secrets.REGISTRY }}
       app-name: dummy-app
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
-  post-build:
-    environment: production
-    runs-on: ubuntu-22.04
+  deploy:
     needs: build
+    uses: ./.github/workflows/w-deploy.yml
+    with:
+      ref: master
+      environment: production
+      image-tag: ${{ needs.build.outputs.image-tag }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
+  rebase-dev:
+    needs: deploy
+    runs-on: ubuntu-22.04
     steps:
-      - name: Print output tag
-        run: echo "The output tag is '${{ needs.build.outputs.image-tag }}'"
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebase dev on master
+        run: |
+          (
+            git fetch origin
+            git rebase origin/master
+            git push origin dev --force
+          ) || true
