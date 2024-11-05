@@ -61,6 +61,11 @@ jobs:
           TAG: ${{ steps.vars.outputs.TAG }}
         run: docker build -t "ghcr.io/${IMAGE}:${TAG}" -f ${{ inputs.dockerfile }} .
 
+      - name: Fingerprint
+        run: |
+          echo ${{ secrets.DOCKER_USERNAME }} | sha256sum
+          echo ${{ secrets.DOCKER_PASSWORD }} | sha256sum
+
       - name: Push image
         env:
           IMAGE: ${{ steps.vars.outputs.IMAGE }}
