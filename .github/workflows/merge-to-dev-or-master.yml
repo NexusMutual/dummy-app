@@ -14,8 +14,8 @@ jobs:
       bump-command: npm version patch --no-git-tag-version
       environment: production
     secrets:
-      DEPLOYER_APP_ID: 'inherit'
-      DEPLOYER_APP_PK: 'inherit'
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
 
   build:
     needs: bump
