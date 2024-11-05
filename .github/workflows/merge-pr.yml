@@ -27,7 +27,7 @@ jobs:
       environment: production
       app-name: ${{ github.repository }}
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DOCKER_USERNAME: true
       DOCKER_PASSWORD: true
 
