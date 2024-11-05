@@ -56,7 +56,7 @@ jobs:
 
       - name: Commit, tag and push
         run: |
-          git config --local user.email "version-bumpooor@nexusmutual.io"
+          git config --local user.email "deployooor@nexusmutual.io"
           git config --local user.name "Version bumpooor"
           git add -a
           git commit -m "chore: release v${{ env.VERSION }}"
