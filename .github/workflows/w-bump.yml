@@ -64,6 +64,6 @@ jobs:
           git config --local user.email "deployooor@nexusmutual.io"
           git config --local user.name "Version bumpooor"
           git add .
-          git commit -m "chore: release v${{ env.VERSION }}"
+          git commit -m "chore: release v${{ env.VERSION }} [skip ci]"
           git tag v${{ env.VERSION }}
           git push origin ${{ inputs.ref }} --tags
