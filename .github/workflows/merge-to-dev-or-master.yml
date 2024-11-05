@@ -14,8 +14,8 @@ jobs:
       bump-command: npm version patch --no-git-tag-version
       environment: production
     secrets:
-      DEPLOYER_APP_ID: true
-      DEPLOYER_APP_PK: true
+      DEPLOYER_APP_ID: 'inherit'
+      DEPLOYER_APP_PK: 'inherit'
 
   build:
     needs: bump
@@ -26,8 +26,8 @@ jobs:
       image: ${{ github.repository }}
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: true
-      DOCKER_PASSWORD: true
+      DOCKER_USERNAME: 'inherit'
+      DOCKER_PASSWORD: 'inherit'
 
   rebase-dev:
     needs: build
@@ -38,5 +38,5 @@ jobs:
       base-ref: master
       environment: production
     secrets:
-      DEPLOYER_APP_ID: true
-      DEPLOYER_APP_PK: true
+      DEPLOYER_APP_ID: 'inherit'
+      DEPLOYER_APP_PK: 'inherit'
