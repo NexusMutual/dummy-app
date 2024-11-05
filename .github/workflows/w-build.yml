@@ -6,17 +6,20 @@ on:
       ref:
         type: string
         required: true
-      dockerfile:
-        type: string
-        default: Dockerfile
       registry:
         type: string
         required: true
-      app-name:
+      image:
         type: string
         required: true
+      dockerfile:
+        type: string
+        default: Dockerfile
+      node-version:
+        type: string
+        default: 20
     secrets:
-      token:
+      github-token:
         required: true
     outputs:
       image-tag:
@@ -30,10 +33,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.token }}
+          token: ${{ secrets.github-token }}
           ref: ${{ inputs.ref }}
 
       - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - name: Get version and revision
         id: vars
@@ -45,16 +52,18 @@ jobs:
       - name: Build image
         env:
           REGISTRY: ${{ inputs.registry }}
-          IMAGE: ${{ inputs.app-name }}
+          IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
         run: docker build -t "${REGISTRY}/${IMAGE}:${TAG}" -f ${{ inputs.dockerfile }} .
 
       - name: Push image
         env:
           REGISTRY: ${{ inputs.registry }}
-          IMAGE: ${{ inputs.app-name }}
+          IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
-        run: docker push "${REGISTRY}/${IMAGE}:${TAG}"
+        run: |
+          echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+          docker push "${REGISTRY}/${IMAGE}:${TAG}"
 
       - name: Print tag
         run: echo "The image tag is '${{ steps.vars.outputs.TAG }}'"

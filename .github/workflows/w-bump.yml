@@ -3,27 +3,40 @@ name: Bump version
 on:
   workflow_call:
     inputs:
+#      repository:
+#        type: string
+#        required: true
       ref:
         type: string
         required: true
+      bump-command:
+        type: string
       node-version:
         type: string
         default: 20
-      bump-command:
-        type: string
-        default: npm version patch --no-git-tag-version
     secrets:
-      token:
+      deployer-app-id:
+        required: true
+      deployer-app-pk:
         required: true
 
 jobs:
   bump:
     runs-on: ubuntu-22.04
     steps:
+      - name: Create deployooor app token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.deployer-app-id }}
+          private-key: ${{ secrets.deployer-app-pk }}
+          #repositories: ${{ inputs.repository }}
+
       - uses: actions/checkout@v4
         with:
+          token: ${{ steps.app-token.outputs.token }}
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.ref }}
-          token: ${{ secrets.token }}
 
       - uses: actions/setup-node@v3
         with:
@@ -44,7 +57,7 @@ jobs:
         run: |
           git config --local user.email "version-bumpooor@nexusmutual.io"
           git config --local user.name "Version bumpooor"
-          git add package.json package-lock.json
+          git add -a
           git commit -m "chore: release v${{ env.VERSION }}"
           git tag v${{ env.VERSION }}
           git push origin ${{ inputs.ref }} --tags

@@ -9,8 +9,10 @@ jobs:
     uses: ./.github/workflows/w-bump.yml
     with:
       ref: dev
+      bump-command: npm version patch --no-git-tag-version
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      deployer-app-id: ${{ secrets.DEPLOYER_APP_ID }}
+      deployer-app-pk: ${{ secrets.DEPLOYER_APP_PK }}
 
   build:
     needs: bump
@@ -20,7 +22,7 @@ jobs:
       registry: ${{ secrets.REGISTRY }}
       app-name: dummy-app
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: build
