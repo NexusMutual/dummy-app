@@ -1,18 +1,16 @@
-name: Merge PR to master
+name: Merge to dev or master
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
-      - dev
       - master
+      - dev
 
 jobs:
   bump:
-    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/w-bump.yml
     with:
-      ref: ${{ github.base_ref }}
+      ref: ${{ github.ref_name }}
       bump-command: npm version patch --no-git-tag-version
       environment: production
     secrets:
@@ -23,7 +21,7 @@ jobs:
     needs: bump
     uses: ./.github/workflows/w-build.yml
     with:
-      ref: ${{ github.base_ref }}
+      ref: ${{ github.ref_name }}
       environment: production
       image: ${{ github.repository }}
     secrets:
@@ -33,7 +31,7 @@ jobs:
 
   rebase-dev:
     needs: build
-    if: github.base_ref == 'refs/heads/master'
+    if: github.ref_name == 'master'
     uses: ./.github/workflows/w-rebase.yml
     with:
       target-ref: dev
