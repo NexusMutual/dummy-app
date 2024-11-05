@@ -19,7 +19,7 @@ on:
         type: string
         default: 20
     secrets:
-      GITHUB_TOKEN:
+      TOKEN:
         required: true
       DOCKER_USERNAME:
         required: true
@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.TOKEN }}
           ref: ${{ inputs.ref }}
 
       - uses: actions/setup-node@v3
