@@ -6,6 +6,10 @@ on:
       - master
       - dev
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   bump:
     uses: ./.github/workflows/w-bump.yml

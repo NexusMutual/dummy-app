@@ -3,6 +3,10 @@ name: Fast-forward dev to master
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   fast-forward:
     uses: ./.github/workflows/w-fast-forward.yml
