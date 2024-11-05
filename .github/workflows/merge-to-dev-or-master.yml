@@ -30,8 +30,8 @@ jobs:
       image: ${{ github.repository }}
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: 'inherit'
-      DOCKER_PASSWORD: 'inherit'
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   rebase-dev:
     needs: build
@@ -42,5 +42,5 @@ jobs:
       base-ref: master
       environment: production
     secrets:
-      DEPLOYER_APP_ID: 'inherit'
-      DEPLOYER_APP_PK: 'inherit'
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
