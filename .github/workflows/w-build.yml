@@ -53,23 +53,20 @@ jobs:
           VERSION=$(node -p 'require("./package.json").version')
           SHA_SHORT=$(git rev-parse --short HEAD)
           echo "TAG=${VERSION}-${SHA_SHORT}" >> $GITHUB_OUTPUT
-          echo "REGISTRY=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_OUTPUT
 
       - name: Build image
         env:
           IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
-          REGISTRY: ${{ steps.vars.outputs.REGISTRY }}
-        run: docker build -t "${REGISTRY}/${IMAGE}:${TAG}" -f ${{ inputs.dockerfile }} .
+        run: docker build -t "ghcr.io/${IMAGE}:${TAG}" -f ${{ inputs.dockerfile }} .
 
       - name: Push image
         env:
           IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
-          REGISTRY: ${{ steps.vars.outputs.REGISTRY }}
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login ghcr.io -u ${{ secrets.DOCKER_USERNAME }}
-          docker push "${REGISTRY}/${IMAGE}:${TAG}"
+          docker push "ghcr.io/${IMAGE}:${TAG}"
 
       - name: Print tag
         run: echo "Pushed ${{ inputs.image }}:${{ steps.vars.outputs.TAG }}"
