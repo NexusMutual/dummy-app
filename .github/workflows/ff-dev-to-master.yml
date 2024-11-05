@@ -1,30 +1,15 @@
-name: Deploy to production
+name: Promote dev to master
 
 on:
   workflow_dispatch:
 
 jobs:
-  fast-forward:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: master
-
-      - name: Fast forward dev to master
-        run: |
-          git fetch origin
-          git merge origin/dev --ff-only
-          git push origin master
-
   deploy:
-    needs: fast-forward
-    uses: ./.github/workflows/w-deploy.yml
+    uses: ./.github/workflows/w-fast-forward.yml
     with:
-      ref: master
       environment: production
-      image-tag: ${{ secrets.IMAGE_TAG }}
+      source-ref: dev
+      target-ref: master
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      DEPLOYER_APP_ID: true
+      DEPLOYER_APP_PK: true

@@ -6,33 +6,32 @@ on:
 
 jobs:
   bump:
-    environment: staging
     uses: ./.github/workflows/w-bump.yml
     with:
       ref: dev
       bump-command: npm version patch --no-git-tag-version
+      environment: production
     secrets:
-      deployer-app-id: ${{ secrets.DEPLOYER_APP_ID }}
-      deployer-app-pk: ${{ secrets.DEPLOYER_APP_PK }}
+      DEPLOYER_APP_ID: true
+      DEPLOYER_APP_PK: true
 
   build:
     needs: bump
     uses: ./.github/workflows/w-build.yml
     with:
+      environment: production
       ref: dev
       image: dummy-app
     secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-      docker-username: ${{ secrets.DOCKER_USERNAME }}
-      docker-password: ${{ secrets.DOCKER_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: true
+      DOCKER_PASSWORD: true
 
   deploy:
     needs: build
-    uses: ./.github/workflows/w-deploy.yml
-    with:
-      ref: dev
-      environment: staging
-      image-tag: ${{ needs.build.outputs.image-tag }}
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
-
+    runs-on: ubuntu-22.04
+    environment: staging
+    steps:
+        - name: Deploy to staging
+          run: |
+            curl -X POST ${{ secrets.STAGING_DEPLOY_WEBHOOK }}

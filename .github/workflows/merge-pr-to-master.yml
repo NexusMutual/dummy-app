@@ -25,18 +25,8 @@ jobs:
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy:
-    needs: build
-    uses: ./.github/workflows/w-deploy.yml
-    with:
-      ref: master
-      environment: production
-      image-tag: ${{ needs.build.outputs.image-tag }}
-    secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
-
   rebase-dev:
-    needs: deploy
+    needs: build
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout dev branch

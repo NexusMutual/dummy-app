@@ -3,6 +3,9 @@ name: Build
 on:
   workflow_call:
     inputs:
+      environment:
+        type: string
+        required: true
       ref:
         type: string
         required: true
@@ -16,11 +19,11 @@ on:
         type: string
         default: 20
     secrets:
-      github-token:
+      GITHUB_TOKEN:
         required: true
-      docker-username:
+      DOCKER_USERNAME:
         required: true
-      docker-password:
+      DOCKER_PASSWORD:
         required: true
     outputs:
       image-tag:
@@ -29,12 +32,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
     outputs:
       image-tag: ${{ steps.vars.outputs.TAG }}
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.github-token }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           ref: ${{ inputs.ref }}
 
       - uses: actions/setup-node@v3

@@ -3,9 +3,9 @@ name: Bump version
 on:
   workflow_call:
     inputs:
-#      repository:
-#        type: string
-#        required: true
+      environment:
+        type: string
+        required: true
       ref:
         type: string
         required: true
@@ -15,28 +15,29 @@ on:
         type: string
         default: 20
     secrets:
-      deployer-app-id:
+      DEPLOYER_APP_ID:
         required: true
-      deployer-app-pk:
+      DEPLOYER_APP_PK:
         required: true
 
 jobs:
   bump:
     runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
     steps:
       - name: Create deployooor app token
         uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ secrets.deployer-app-id }}
-          private-key: ${{ secrets.deployer-app-pk }}
+          app-id: ${{ secrets.DEPLOYER_APP_ID }}
+          private-key: ${{ secrets.DEPLOYER_APP_PK }}
           #repositories: ${{ inputs.repository }}
 
       - uses: actions/checkout@v4
         with:
           token: ${{ steps.app-token.outputs.token }}
-          repository: ${{ inputs.repository }}
           ref: ${{ inputs.ref }}
+#          repository: ${{ inputs.repository }}
 
       - uses: actions/setup-node@v3
         with:
