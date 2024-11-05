@@ -35,3 +35,4 @@ jobs:
       image-tag: ${{ needs.build.outputs.image-tag }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
+
