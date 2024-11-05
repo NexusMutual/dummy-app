@@ -26,8 +26,8 @@ jobs:
       image: ${{ github.repository }}
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: 'inherit'
-      DOCKER_PASSWORD: 'inherit'
+#      DOCKER_USERNAME: 'inherit'
+#      DOCKER_PASSWORD: 'inherit'
 
   rebase-dev:
     needs: build

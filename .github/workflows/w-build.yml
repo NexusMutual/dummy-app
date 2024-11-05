@@ -21,10 +21,10 @@ on:
     secrets:
       TOKEN:
         required: true
-      DOCKER_USERNAME:
-        required: true
-      DOCKER_PASSWORD:
-        required: true
+#      DOCKER_USERNAME:
+#        required: true
+#      DOCKER_PASSWORD:
+#        required: true
     outputs:
       image-tag:
         value: ${{ jobs.build.outputs.image-tag }}
@@ -65,7 +65,7 @@ jobs:
           IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
         run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | docker login ghcr.io -u ${{ secrets.DOCKER_USERNAME }}
+          echo ${{ secrets.TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
           docker push "ghcr.io/${IMAGE}:${TAG}"
 
       - name: Print tag
