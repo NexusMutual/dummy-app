@@ -6,9 +6,6 @@ on:
       ref:
         type: string
         required: true
-      registry:
-        type: string
-        required: true
       image:
         type: string
         required: true
@@ -20,6 +17,10 @@ on:
         default: 20
     secrets:
       github-token:
+        required: true
+      docker-username:
+        required: true
+      docker-password:
         required: true
     outputs:
       image-tag:
@@ -48,22 +49,23 @@ jobs:
           VERSION=$(node -p 'require("./package.json").version')
           SHA_SHORT=$(git rev-parse --short HEAD)
           echo "TAG=${VERSION}-${SHA_SHORT}" >> $GITHUB_OUTPUT
+          echo "REGISTRY=ghcr.io/${{ github.repository_owner }}" >> $GITHUB_OUTPUT
 
       - name: Build image
         env:
-          REGISTRY: ${{ inputs.registry }}
           IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
+          REGISTRY: ${{ steps.vars.outputs.REGISTRY }}
         run: docker build -t "${REGISTRY}/${IMAGE}:${TAG}" -f ${{ inputs.dockerfile }} .
 
       - name: Push image
         env:
-          REGISTRY: ${{ inputs.registry }}
           IMAGE: ${{ inputs.image }}
           TAG: ${{ steps.vars.outputs.TAG }}
+          REGISTRY: ${{ steps.vars.outputs.REGISTRY }}
         run: |
-          echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login ghcr.io -u ${{ secrets.DOCKER_USERNAME }}
           docker push "${REGISTRY}/${IMAGE}:${TAG}"
 
       - name: Print tag
-        run: echo "The image tag is '${{ steps.vars.outputs.TAG }}'"
+        run: echo "Pushed ${{ inputs.image }}:${{ steps.vars.outputs.TAG }}"

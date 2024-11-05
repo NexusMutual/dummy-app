@@ -6,6 +6,7 @@ on:
 
 jobs:
   bump:
+    environment: staging
     uses: ./.github/workflows/w-bump.yml
     with:
       ref: dev
@@ -19,10 +20,11 @@ jobs:
     uses: ./.github/workflows/w-build.yml
     with:
       ref: dev
-      registry: ${{ secrets.REGISTRY }}
-      app-name: dummy-app
+      image: dummy-app
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
+      docker-username: ${{ secrets.DOCKER_USERNAME }}
+      docker-password: ${{ secrets.DOCKER_PASSWORD }}
 
   deploy:
     needs: build
