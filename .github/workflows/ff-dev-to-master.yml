@@ -15,5 +15,5 @@ jobs:
       source-ref: dev
       target-ref: master
     secrets:
-      DEPLOYER_APP_ID: true
-      DEPLOYER_APP_PK: true
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
