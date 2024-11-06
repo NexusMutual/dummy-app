@@ -12,8 +12,8 @@ jobs:
     uses: ./.github/workflows/w-fast-forward.yml
     with:
       environment: production
-      source-ref: dev
-      target-ref: master
+      source-ref: refs/heads/dev
+      target-ref: refs/heads/master
     secrets:
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
       DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
