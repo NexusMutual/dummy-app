@@ -15,6 +15,9 @@ on:
       target-tag:
         type: string
         required: true
+      node-version:
+        type: string
+        default: 20
     secrets:
       TOKEN:
         required: true
