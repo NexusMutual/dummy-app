@@ -20,6 +20,7 @@ jobs:
 
   tag-image:
     uses: ./.github/workflows/w-tag-image.yml
+    needs: fast-forward
     with:
       environment: production
       image: ${{ github.repository }}
