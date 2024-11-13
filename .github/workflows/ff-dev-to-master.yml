@@ -23,7 +23,7 @@ jobs:
     with:
       environment: production
       image: ${{ github.repository }}
-      source-tag: staging
+      ref: master
       target-tag: latest
     secrets:
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}

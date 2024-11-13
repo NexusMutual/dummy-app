@@ -39,7 +39,7 @@ jobs:
     with:
       environment: production
       image: ${{ github.repository }}
-      source-tag: ${{ needs.build.outputs.TAG }}
+      ref: ${{ github.ref_name }}
       target-tag: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
