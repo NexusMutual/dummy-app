@@ -1,0 +1,65 @@
+name: Tag Image
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      ref:
+        type: string
+        required: true
+      image:
+        type: string
+        required: true
+      target-tag:
+        type: string
+        required: true
+      node-version:
+        type: string
+        default: 20
+    secrets:
+      TOKEN:
+        required: true
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+
+jobs:
+  tag-image:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN }}
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Get version and revision
+        id: vars
+        run: |
+          VERSION=$(node -p 'require("./package.json").version')
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          echo "SOURCE_TAG=${VERSION}-${SHA_SHORT}" >> $GITHUB_OUTPUT
+
+      - name: Tag image
+        env:
+          IMAGE: ${{ inputs.image }}
+          TARGET_TAG: ${{ inputs.target-tag }}
+          SOURCE_TAG: ${{ steps.vars.outputs.SOURCE_TAG }}
+        run: docker buildx imagetools create ghcr.io/${IMAGE}:${SOURCE_TAG} --tag ghcr.io/${IMAGE}:${TARGET_TAG} .
+
+      - name: Push tag
+        env:
+          IMAGE: ${{ inputs.image }}
+          TAG: ${{ inputs.taget-tag }}
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login ghcr.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push "ghcr.io/${IMAGE}:${TAG}"

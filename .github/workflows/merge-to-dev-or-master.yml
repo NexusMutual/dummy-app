@@ -33,6 +33,19 @@ jobs:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
+  tag-image:
+    needs: build
+    uses: ./.github/workflows/w-tag-image.yml
+    with:
+      environment: production
+      image: ${{ github.repository }}
+      ref: ${{ github.ref_name }}
+      target-tag: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
   rebase-dev:
     needs: build
     if: github.ref_name == 'master'
@@ -44,3 +57,30 @@ jobs:
     secrets:
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
       DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+
+  rebuild-staging:
+    needs: rebase-dev
+    uses: ./.github/workflows/w-build.yml
+    if: github.ref_name == 'master'
+    with:
+      ref: dev
+      environment: production
+      image: ${{ github.repository }}
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  retag-staging:
+    needs: rebuild-staging
+    if: github.ref_name == 'master'
+    uses: ./.github/workflows/w-tag-image.yml
+    with:
+      environment: production
+      image: ${{ github.repository }}
+      ref: dev
+      target-tag: staging
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
