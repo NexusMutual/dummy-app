@@ -1,0 +1,60 @@
+name: Merge to dev or master
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  reset-release-candidate:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/w-reset.yml
+    with:
+      target-ref: release-candidate
+      base-ref: dev
+      environment: production
+    secrets:
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+
+  bump:
+    needs: reset-release-candidate
+    uses: ./.github/workflows/w-bump.yml
+    with:
+      ref: 'release-candidate'
+      bump-command: npm version patch --no-git-tag-version
+      environment: production
+    secrets:
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+
+  build:
+    needs: bump
+    uses: ./.github/workflows/w-build.yml
+    with:
+      ref: 'release-candidate'
+      environment: production
+      image: ${{ github.repository }}
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  tag-image:
+    needs: build
+    uses: ./.github/workflows/w-tag-image.yml
+    with:
+      environment: production
+      image: ${{ github.repository }}
+      ref: 'release-candidate'
+      target-tag: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

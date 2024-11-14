@@ -1,33 +1,22 @@
 name: Merge to dev or master
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - master
-      - dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
-  reset-release-candidate:
-    if: github.ref_name == 'dev'
-    uses: ./.github/workflows/w-reset.yml
-    with:
-      target-ref: release-candidate
-      base-ref: dev
-      environment: production
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
-
   bump:
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/w-bump.yml
-    if: ${{ success() ||  needs.reset-release-candidate.result == 'skipped'}}
-    needs: reset-release-candidate
     with:
-      ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
+      ref: 'master'
       bump-command: npm version patch --no-git-tag-version
       environment: production
     secrets:
@@ -36,10 +25,9 @@ jobs:
 
   build:
     needs: bump
-    if: ${{ success() ||  needs.bump.result == 'success' }}
     uses: ./.github/workflows/w-build.yml
     with:
-      ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
+      ref: 'master'
       environment: production
       image: ${{ github.repository }}
     secrets:
@@ -53,7 +41,7 @@ jobs:
     with:
       environment: production
       image: ${{ github.repository }}
-      ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
+      ref: 'master'
       target-tag: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +50,6 @@ jobs:
 
   rebase-dev:
     needs: build
-    if: github.ref_name == 'master'
     uses: ./.github/workflows/w-rebase.yml
     with:
       target-ref: dev
@@ -75,7 +62,6 @@ jobs:
   rebuild-staging:
     needs: rebase-dev
     uses: ./.github/workflows/w-build.yml
-    if: github.ref_name == 'master'
     with:
       ref: release-candidate
       environment: production
@@ -87,7 +73,6 @@ jobs:
 
   retag-staging:
     needs: rebuild-staging
-    if: github.ref_name == 'master'
     uses: ./.github/workflows/w-tag-image.yml
     with:
       environment: production
