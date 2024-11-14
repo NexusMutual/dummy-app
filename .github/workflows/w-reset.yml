@@ -33,8 +33,8 @@ jobs:
         uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ secrets.DEPLOYER_APP_ID }}
-          private-key: ${{ secrets.DEPLOYER_APP_PK }}
+          app-id: ${{ secrets.deployer-app-id }}
+          private-key: ${{ secrets.deployer-app-pk }}
           #repositories: ${{ inputs.repository }}
 
       - uses: actions/checkout@v4
@@ -43,9 +43,9 @@ jobs:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.target-ref }}
 
-      - name: Rebase
+      - name: Reset
         run: |
           git config --local user.email "deployooor@nexusmutual.io"
           git config --local user.name "Deployooor"
-          git rebase ${{ inputs.base-ref }} --rebase-merges
+          git reset --hard ${{ inputs.base-ref }}
           git push origin ${{ inputs.target-ref }} --force
