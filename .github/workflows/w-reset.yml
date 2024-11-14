@@ -43,9 +43,16 @@ jobs:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.target-ref }}
 
-      - name: Rebase
+      - name: Print out values
+        run: |
+          echo "${{ inputs.base-ref }}"
+          echo "${{ inputs.target-ref }}"
+          git branch --show-current
+
+      - name: Reset
         run: |
           git config --local user.email "deployooor@nexusmutual.io"
           git config --local user.name "Deployooor"
-          git rebase ${{ inputs.base-ref }} --rebase-merges
+          git fetch --all
+          git reset --hard origin/${{ inputs.base-ref }}
           git push origin ${{ inputs.target-ref }} --force
