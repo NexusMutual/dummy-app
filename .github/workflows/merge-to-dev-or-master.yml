@@ -1,20 +1,34 @@
 name: Merge to dev or master
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - master
-      - release-candidate
+      - dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
+  reset-release-candidate:
+    if: github.ref_name == 'dev' && github.event.pull_request.merged == true
+    uses: ./.github/workflows/w-reset.yml
+    with:
+      target-ref: release-candidate
+      base-ref: dev
+      environment: production
+    secrets:
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+
   bump:
     uses: ./.github/workflows/w-bump.yml
+    if: github.event.pull_request.merged == true
     with:
-      ref: ${{ github.ref_name }}
+      ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
       bump-command: npm version patch --no-git-tag-version
       environment: production
     secrets:
@@ -25,7 +39,7 @@ jobs:
     needs: bump
     uses: ./.github/workflows/w-build.yml
     with:
-      ref: ${{ github.ref_name }}
+      ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
       environment: production
       image: ${{ github.repository }}
     secrets:
@@ -39,7 +53,7 @@ jobs:
     with:
       environment: production
       image: ${{ github.repository }}
-      ref: ${{ github.ref_name }}
+      ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
       target-tag: ${{ github.ref_name == 'master' && 'latest' || 'staging' }}
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,3 +71,30 @@ jobs:
     secrets:
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
       DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+
+  rebuild-staging:
+    needs: rebase-dev
+    uses: ./.github/workflows/w-build.yml
+    if: github.ref_name == 'master'
+    with:
+      ref: release-candidate
+      environment: production
+      image: ${{ github.repository }}
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+  retag-staging:
+    needs: rebuild-staging
+    if: github.ref_name == 'master'
+    uses: ./.github/workflows/w-tag-image.yml
+    with:
+      environment: production
+      image: ${{ github.repository }}
+      ref: release-candidate
+      target-tag: staging
+    secrets:
+      TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
