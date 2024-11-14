@@ -36,6 +36,7 @@ jobs:
 
   build:
     needs: bump
+    if: success()
     uses: ./.github/workflows/w-build.yml
     with:
       ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
