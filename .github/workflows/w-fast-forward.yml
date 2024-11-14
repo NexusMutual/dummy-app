@@ -39,6 +39,6 @@ jobs:
 
       - name: Fast-forward merge
         run: |
-          git fetch origin/${{ inputs.source-ref }}
-          git merge origin/${{ inputs.source-ref }} --ff-only
+          git fetch origin ${{ inputs.source-ref }}
+          git merge origin ${{ inputs.source-ref }} --ff-only
           git push origin ${{ inputs.target-ref }}
