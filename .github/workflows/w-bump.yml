@@ -67,8 +67,8 @@ jobs:
           git commit -m "chore: release v${{ env.VERSION }} [skip ci]"
           git push origin ${{ inputs.ref }}
 
-      - name: Tag
-        if: inputs.ref == 'master'
-        run: |
-          git tag v${{ env.VERSION }}
-          git push origin --tags
+#      - name: Tag
+#        if: inputs.ref == 'master'
+#        run: |
+#          git tag v${{ env.VERSION }}
+#          git push origin --tags

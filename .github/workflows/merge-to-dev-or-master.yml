@@ -24,7 +24,7 @@ jobs:
 
   bump:
     uses: ./.github/workflows/w-bump.yml
-    if: ${{ always() }}
+    if: ${{ success() ||  needs.reset-release-candidate.result == 'skipped'}}
     needs: reset-release-candidate
     with:
       ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
@@ -36,6 +36,7 @@ jobs:
 
   build:
     needs: bump
+    if: ${{ success() ||  needs.bump.result == 'success' }}
     uses: ./.github/workflows/w-build.yml
     with:
       ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
