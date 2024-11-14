@@ -28,5 +28,5 @@ jobs:
       target-tag: latest
     secrets:
       TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
