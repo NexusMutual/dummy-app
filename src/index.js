@@ -11,5 +11,5 @@ app.get('/ping', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running`);
+  console.log(`Server running with hotfix`);
 });
