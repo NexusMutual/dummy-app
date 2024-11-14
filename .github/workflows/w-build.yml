@@ -66,7 +66,9 @@ jobs:
           IMAGE: ${{ steps.vars.outputs.IMAGE }}
           TAG: ${{ steps.vars.outputs.TAG }}
         run: |
+          echo "logging in"
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login ghcr.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          echo "pushing"
           docker push "ghcr.io/${IMAGE}:${TAG}"
 
       - name: Print tag

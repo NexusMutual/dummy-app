@@ -1,9 +1,7 @@
 name: Merge to dev or master
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - master
       - dev
@@ -14,7 +12,7 @@ concurrency:
 
 jobs:
   reset-release-candidate:
-    if: github.ref_name == 'dev' && github.event.pull_request.merged == true
+    if: github.ref_name == 'dev'
     uses: ./.github/workflows/w-reset.yml
     with:
       target-ref: release-candidate
@@ -26,7 +24,8 @@ jobs:
 
   bump:
     uses: ./.github/workflows/w-bump.yml
-    if: github.event.pull_request.merged == true
+    if: ${{ always() }}
+    needs: reset-release-candidate
     with:
       ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
       bump-command: npm version patch --no-git-tag-version
