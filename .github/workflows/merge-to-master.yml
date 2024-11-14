@@ -56,8 +56,19 @@ jobs:
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
       DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
 
-  rebuild-staging:
+  reset-release-candidate:
     needs: rebase-dev
+    uses: ./.github/workflows/w-reset.yml
+    with:
+      target-ref: release-candidate
+      base-ref: dev
+      environment: production
+    secrets:
+      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
+      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+
+  rebuild-staging:
+    needs: reset-release-candidate
     uses: ./.github/workflows/w-build.yml
     with:
       ref: release-candidate

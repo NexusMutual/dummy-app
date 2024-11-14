@@ -47,5 +47,6 @@ jobs:
         run: |
           git config --local user.email "deployooor@nexusmutual.io"
           git config --local user.name "Deployooor"
-          git rebase ${{ inputs.base-ref }} --rebase-merges
+          git fetch --all
+          git rebase origin/${{ inputs.base-ref }} --rebase-merges
           git push origin ${{ inputs.target-ref }} --force
