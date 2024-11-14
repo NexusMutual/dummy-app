@@ -1,7 +1,9 @@
-name: Merge to dev or master
+name: Merge to master
 
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - master
 
@@ -11,6 +13,7 @@ concurrency:
 
 jobs:
   bump:
+    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/w-bump.yml
     with:
       ref: 'master'

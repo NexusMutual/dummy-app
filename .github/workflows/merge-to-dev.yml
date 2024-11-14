@@ -1,4 +1,4 @@
-name: Merge to dev or master
+name: Merge to dev
 
 on:
   pull_request:
