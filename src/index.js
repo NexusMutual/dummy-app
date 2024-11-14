@@ -15,5 +15,5 @@ app.get('/cool', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running with hotfix`);
+  console.log(`Server running with new hotfix`);
 });
