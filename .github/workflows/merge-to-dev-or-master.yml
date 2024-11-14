@@ -37,6 +37,7 @@ jobs:
   build:
     needs: bump
     uses: ./.github/workflows/w-build.yml
+    if: ${{ needs.bump.result == 'success' }}
     with:
       ref: ${{ github.ref_name == 'master' && 'master' || 'release-candidate' }}
       environment: production
