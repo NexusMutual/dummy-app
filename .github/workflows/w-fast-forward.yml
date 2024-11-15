@@ -43,12 +43,8 @@ jobs:
           git merge origin/${{ inputs.source-ref }} --ff-only
           git push origin ${{ inputs.target-ref }}
 
-      - name: Get package.json version
-        if: github.event.inputs.target-ref == 'master'
-        run: echo VERSION=$(node -p 'require("./package.json").version') >> $GITHUB_ENV
-
       - name: Tag
-        if: github.event.inputs.target-ref == 'master'
+        if: inputs.target-ref == 'master'
         run: |
           VERSION=$(node -p 'require("./package.json").version'
           git tag v${VERSION}
