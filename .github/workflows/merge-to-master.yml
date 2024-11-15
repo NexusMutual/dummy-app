@@ -1,9 +1,7 @@
 name: Merge to master
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - master
 
@@ -13,7 +11,6 @@ concurrency:
 
 jobs:
   bump:
-    if: github.event.pull_request.merged == true
     uses: ./.github/workflows/w-bump.yml
     with:
       ref: 'master'
@@ -58,39 +55,3 @@ jobs:
     secrets:
       DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
       DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
-
-  reset-release-candidate:
-    needs: rebase-dev
-    uses: ./.github/workflows/w-reset.yml
-    with:
-      target-ref: release-candidate
-      base-ref: dev
-      environment: production
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
-
-  rebuild-staging:
-    needs: reset-release-candidate
-    uses: ./.github/workflows/w-build.yml
-    with:
-      ref: release-candidate
-      environment: production
-      image: ${{ github.repository }}
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-  retag-staging:
-    needs: rebuild-staging
-    uses: ./.github/workflows/w-tag-image.yml
-    with:
-      environment: production
-      image: ${{ github.repository }}
-      ref: release-candidate
-      target-tag: staging
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
