@@ -10,10 +10,6 @@ app.get('/ping', (req, res) => {
   res.send('pong!');
 });
 
-app.get('/cool', (req, res) => {
-  res.send('Ice cold!');
-});
-
 app.listen(port, () => {
   console.log(`Server running with new hotfix`);
 });
