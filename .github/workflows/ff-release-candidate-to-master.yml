@@ -32,6 +32,7 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   fast-forward-dev:
+    needs: fast-forward
     uses: ./.github/workflows/w-fast-forward.yml
     with:
       environment: production
